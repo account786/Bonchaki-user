@@ -1,0 +1,1461 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ছাত্র ও শিক্ষক তথ্য</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #00695C; /* Deep Teal Green */
+            --secondary-color: #FDFCF8; /* Off-White/Cream */
+            --accent-color: #D4AF37; /* Soft Gold */
+            --text-color: #333333;
+            --white: #ffffff;
+            --light-gray: #E0E0E0;
+            --paid-color: #4CAF50;
+            --due-color: #D32F2F;
+            --shadow: 0 4px 15px rgba(0,0,0,0.08);
+            --font-family: 'Noto Sans Bengali', sans-serif;
+        }
+        body {
+            font-family: var(--font-family);
+            margin: 0;
+            background-color: var(--secondary-color);
+            color: var(--text-color);
+            line-height: 1.6;
+            background-image: linear-gradient(45deg, rgba(0, 105, 92, 0.03) 25%, transparent 25%, transparent 50%, rgba(0, 105, 92, 0.03) 50%, rgba(0, 105, 92, 0.03) 75%, transparent 75%, transparent);
+            background-size: 70px 70px;
+        }
+        .container {
+            width: 95%; max-width: 1200px; margin: 0 auto; padding: 20px;
+        }
+        .header {
+            background: var(--primary-color);
+            background-image: linear-gradient(45deg, rgba(255, 255, 255, 0.05) 25%, transparent 25%, transparent 50%, rgba(255, 255, 255, 0.05) 50%, rgba(255, 255, 255, 0.05) 75%, transparent 75%, transparent);
+            background-size: 40px 40px;
+            color: var(--white);
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 5px solid var(--accent-color);
+            border-radius: 0 0 30px 30px;
+            box-shadow: var(--shadow);
+        }
+        .header h1 {
+            margin: 0;
+            font-weight: 700;
+            font-size: 2.5em;
+        }
+        
+        .main-menu {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 25px;
+            margin: 40px 0;
+        }
+        #dashboard-menu {
+            grid-column: 1 / -1;
+            padding: 25px 15px;
+            font-size: 1.3em;
+        }
+        .menu-item {
+            cursor: pointer;
+            padding: 25px 15px;
+            text-align: center;
+            border-radius: 15px;
+            transition: all 0.3s ease-in-out;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--light-gray);
+            font-weight: 600;
+            font-size: 1.1em;
+            border-bottom: 4px solid transparent;
+        }
+        .menu-item.active, .menu-item:hover {
+            background-color: var(--primary-color);
+            color: var(--white);
+            transform: translateY(-8px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 105, 92, 0.25);
+            border-bottom-color: var(--accent-color);
+        }
+        .menu-icon { 
+            font-size: 3em;
+            line-height: 1; 
+        }
+
+        .page { display: none; }
+        .page.active { display: block; animation: fadeIn 0.6s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+        .page-title {
+            color: var(--primary-color);
+            font-size: 2em;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 30px;
+            position: relative;
+        }
+        .page-title::after {
+            content: '';
+            display: block;
+            width: 80px;
+            height: 4px;
+            background: var(--accent-color);
+            border-radius: 2px;
+            margin: 10px auto 0;
+        }
+
+        /* --- Dashboard Styles --- */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        .card {
+            background-color: var(--white); 
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: var(--shadow); text-align: center;
+            border-top: 5px solid var(--primary-color);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1);
+        }
+        .card h3 { 
+            margin: 0 0 10px 0; 
+            color: var(--primary-color); 
+            font-size: 1.1em;
+            font-weight: 600; 
+        }
+        .card p { 
+            font-size: 2.2em;
+            font-weight: 700; 
+            margin: 0; 
+            color: var(--text-color); 
+        }
+        .card#netYearlyIncomeCard[style*="var(--due-color)"] p {
+            color: var(--due-color);
+        }
+
+        /* --- Generic Filter/Search Styles --- */
+        .search-box, .filter-section select, .filter-section input {
+            padding: 12px 15px;
+            border: 1px solid var(--light-gray); border-radius: 8px; box-sizing: border-box;
+            font-family: var(--font-family);
+            font-size: 1em;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .search-box:focus, .filter-section select:focus, .filter-section input:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 105, 92, 0.15);
+        }
+        .filter-section { display: flex; gap: 15px; margin-bottom: 25px; flex-wrap: wrap; }
+        
+        /* === STUDENT PAYMENT TABLE STYLES === */
+        .student-payment-container {
+            border: 1px solid var(--light-gray);
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            max-height: 90vh;
+            overflow: auto;
+        }
+        #studentPaymentTable {
+            width: 100%;
+            min-width: 950px;
+            border-collapse: separate;
+            border-spacing: 0;
+        }
+        #studentPaymentTable th, #studentPaymentTable td {
+            padding: 4px 5px;
+            font-size: 0.8em;
+            white-space: nowrap;
+            border-bottom: 1px solid var(--light-gray);
+            vertical-align: middle;
+        }
+        #studentPaymentTable th {
+            background-color: var(--primary-color);
+            color: var(--white);
+            text-align: center;
+            font-weight: 600;
+        }
+        #studentPaymentTable tbody tr:nth-child(even) {
+             background-color: #f8f9fa;
+        }
+        #studentPaymentTable tbody tr:hover {
+            background-color: #e8f5e9;
+        }
+
+        #studentPaymentTable thead th {
+            position: -webkit-sticky; position: sticky;
+            top: 0;
+            z-index: 3;
+        }
+        #studentPaymentTable tfoot td {
+            position: -webkit-sticky; position: sticky;
+            bottom: 0;
+            z-index: 3;
+            background-color: #e0f2f1;
+            font-weight: 700;
+            color: var(--primary-color);
+            text-align: center !important;
+            border-top: 2px solid var(--primary-color);
+        }
+
+        #studentPaymentTable th:first-child,
+        #studentPaymentTable td:first-child {
+            position: -webkit-sticky; position: sticky;
+            left: 0;
+            z-index: 2;
+            background-color: var(--secondary-color);
+            width: 60px; min-width: 60px; max-width: 60px;
+            text-align: left;
+            border-right: 2px solid var(--primary-color);
+            white-space: normal;
+            word-break: break-word;
+        }
+        #studentPaymentTable tbody tr:hover td:first-child { background-color: #e8f5e9; }
+        #studentPaymentTable tbody tr:nth-child(even) td:first-child { background-color: #f8f9fa; }
+        #studentPaymentTable tbody tr:nth-child(even):hover td:first-child { background-color: #e8f5e9; }
+        
+        #studentPaymentTable thead th:first-child {
+            z-index: 4;
+            background-color: var(--primary-color);
+        }
+        
+        .form-no {
+            font-weight: 700;
+            color: var(--primary-color);
+            display: block;
+            font-size: 0.9em;
+            text-align: left;
+            margin-right: 0;
+        }
+
+        #studentPaymentTable th:last-child,
+        #studentPaymentTable td:last-child {
+            background-color: #e0f2f1;
+            color: var(--primary-color);
+            font-weight: 700;
+            text-align: center !important;
+            border-left: 2px solid #c8e6c9;
+            min-width: 70px;
+        }
+        #studentPaymentTable thead th:last-child {
+            background-color: #004D40;
+            color: var(--white);
+        }
+
+        .payment-cell { text-align: center !important; min-width: 60px; }
+        .payment-cell.status-paid { 
+            color: var(--paid-color); font-weight: 500; font-size: 0.9em; line-height: 1.3;
+        }
+
+        .payment-cell.status-paid small { 
+            font-size: 0.75em; 
+            opacity: 0.9; 
+            display: block; 
+            color: #0277BD;
+            font-weight: 600;
+        }
+        .payment-cell.status-due { color: var(--due-color); font-size: 1.4em; }
+        
+
+        .btn-view-result {
+            background-color: var(--primary-color);
+            color: white; border: none; padding: 8px 15px;
+            border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;
+            transition: background-color 0.3s;
+        }
+        .btn-view-result:hover { background-color: #004D40; }
+        
+        /* === MODIFICATION START: ALL RESULTS TABLE STYLES === */
+        .data-table-container {
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1); /* Black shadow */
+            overflow: hidden;
+            border: 1px solid var(--light-gray);
+        }
+        #allResultsTable {
+            min-width: 1200px;
+            font-size: 14px;
+            border-collapse: collapse;
+            border-spacing: 0;
+        }
+        #allResultsTable th {
+            background-color: var(--primary-color);
+            color: white;
+            white-space: nowrap;
+            padding: 12px 10px;
+        }
+        #allResultsTable th, #allResultsTable td {
+            border: 1px solid #e0e0e0;
+            padding: 10px;
+        }
+        #allResultsTable tbody tr:hover {
+            background-color: #e8f5e9;
+        }
+        /* Width adjustments */
+        #allResultsTable .th-form-no, #allResultsTable .td-form-no { width: 8%; }
+        #allResultsTable .th-student-name, #allResultsTable .td-student-name { width: 25%; text-align: left; }
+
+        #allResultsTable .th-subject, #allResultsTable .td-subject { width: 7%; text-align: center; }
+        
+        /* Styles for data cells in focus columns */
+        #allResultsTable .td-focus {
+            width: 8%; font-weight: 700 !important; background-color: #e0f2f1; color: var(--primary-color);
+        }
+        /* Styles for header cells in focus columns */
+        #allResultsTable th.th-focus {
+             width: 8%;
+             font-weight: 700 !important;
+             background-color: #004D40 !important; /* Darker shade of primary */
+             color: var(--white) !important;
+        }
+        /* === MODIFICATION END === */
+
+        /* --- Control Panel Styles --- */
+        .controls-panel {
+            background-color: var(--white);
+            padding: 25px; border-radius: 15px;
+            box-shadow: var(--shadow); margin-bottom: 30px;
+            border-top: 5px solid var(--accent-color);
+        }
+        .controls-panel h3 {
+            text-align: center; margin-top: 0; margin-bottom: 8px;
+            color: var(--primary-color); font-size: 1.5em;
+        }
+        .current-year-display {
+            text-align: center; margin: -5px 0 15px 0; font-size: 1.2em;
+            font-weight: 600; color: var(--accent-color);
+        }
+        .controls-panel p.instructions {
+            text-align: center; margin-top: 0; margin-bottom: 25px;
+            color: #666; font-size: 0.95em;
+        }
+        .control-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px; align-items: end;
+        }
+        .control-item { display: flex; flex-direction: column; }
+        .control-item label {
+            margin-bottom: 8px; font-weight: 600;
+            color: var(--primary-color); font-size: 0.9em;
+        }
+        .control-item select, .control-item input, .control-item button {
+            width: 100%; padding: 12px 15px; border: 1px solid var(--light-gray);
+            border-radius: 8px; box-sizing: border-box; font-family: var(--font-family);
+            font-size: 1em; transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .control-item select:focus, .control-item input:focus, .control-item button:focus {
+            outline: none; border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(0, 105, 92, 0.15);
+        }
+        
+        /* === NEW RESULT DISPLAY STYLES (COMPACT) === */
+        #result-display {
+            display: none; max-width: 800px;
+            margin: 30px auto; animation: fadeIn 0.5s;
+        }
+        .result-card {
+            background-color: var(--white); border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); border-top: 8px solid var(--primary-color);
+            overflow: hidden;
+        }
+        .result-header { text-align: center; padding: 15px; background-color: #f8f9fa; }
+        .result-header h3 {
+            margin: 0 0 3px 0; color: var(--primary-color);
+            font-size: 1.4em; font-weight: 700;
+        }
+        .result-header p { margin: 0; color: var(--text-color); font-size: 0.95em; font-weight: 500; }
+        .result-summary {
+            display: flex; justify-content: space-around; padding: 12px;
+            background-color: var(--primary-color); color: var(--white);
+        }
+        .summary-item { text-align: center; }
+        .summary-item span { display: block; font-weight: 600; }
+        .summary-item .label { font-size: 0.85em; opacity: 0.9; }
+        .summary-item .value { font-size: 1.6em; line-height: 1.2; }
+        .summary-item .gpa-value {
+            background-color: var(--accent-color); color: var(--primary-color); padding: 3px 10px;
+            border-radius: 50px; font-size: 1.2em;
+        }
+
+        .subject-grid {
+            display: flex;
+            flex-direction: column;
+            gap: 4px; /* Reduced gap */
+            padding: 15px; /* Reduced padding */
+        }
+        .subject-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: #f8f9fa;
+            padding: 0 15px;
+            border-radius: 8px;
+            border: 1px solid var(--light-gray);
+            min-height: 40px; /* Reduced height */
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+        }
+        .subject-item:hover { 
+            transform: translateY(-3px) scale(1.01); 
+            box-shadow: var(--shadow); 
+            border-color: var(--primary-color);
+        }
+        .subject-item-name {
+            font-size: 1em; /* Reduced font size */
+            color: var(--primary-color);
+            font-weight: 600;
+            flex: 3;
+            text-align: left;
+        }
+        .subject-item-mark, .subject-item-grade {
+            font-size: 0.95em; /* Reduced font size */
+            font-weight: 500;
+            text-align: center;
+            flex: 1;
+        }
+        .subject-item-grade.fail-grade { 
+            color: var(--due-color); 
+            font-weight: 700; 
+        }
+        
+        /* --- Teacher Card Styles --- */
+        .card-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 25px;
+        }
+        .teacher-card {
+            background-color: var(--white); border-radius: 15px; box-shadow: var(--shadow);
+            padding: 25px; display: flex; flex-direction: column; align-items: center;
+            text-align: center; border-top: 6px solid var(--accent-color);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .teacher-card:hover { transform: translateY(-10px); box-shadow: 0 12px 28px rgba(0, 0, 0, 0.12); }
+        .teacher-avatar {
+            width: 100px; height: 100px; border-radius: 50%; background-color: var(--primary-color);
+            color: var(--white); display: flex; align-items: center; justify-content: center;
+            font-size: 3em; font-weight: 600; margin-bottom: 20px;
+            border: 4px solid var(--white); box-shadow: 0 0 15px rgba(0,0,0,0.1);
+        }
+        .teacher-card h3 {
+            margin: 0 0 5px 0; color: var(--primary-color); font-size: 1.4em; font-weight: 700;
+        }
+        .teacher-card .teacher-role {
+            font-size: 1em; color: var(--accent-color);
+            font-weight: 600; margin-bottom: 20px;
+        }
+        .teacher-info {
+            list-style: none; padding: 0; margin: 0;
+            width: 100%; text-align: left; font-size: 0.95em;
+        }
+        .teacher-info li {
+            display: flex; align-items: flex-start;
+            gap: 12px; margin-bottom: 12px; color: var(--text-color);
+        }
+        .teacher-info .info-icon {
+            flex-shrink: 0; width: 20px; height: 20px;
+            color: var(--primary-color); margin-top: 2px;
+        }
+        a[href^="tel"] { color: inherit; text-decoration: none; cursor: pointer; }
+        a[href^="tel"]:hover { text-decoration: underline; color: var(--primary-color); }
+        
+        /* === RECEIPT DETAILS STYLES === */
+        #receipts-display {
+            background: var(--secondary-color); padding: 20px;
+            border-radius: 12px; box-shadow: var(--shadow);
+            border: 2px solid var(--primary-color);
+        }
+        #receipts-display .controls-panel {
+             border-left: 5px solid var(--accent-color);
+        }
+        #receiptsTable th, #receiptsTable td { text-align: center; }
+        #receiptsTable thead th {
+            background-color: #004D40; /* Darker Islamic Green */
+            color: var(--accent-color); /* Golden text */
+            font-size: 1.1em;
+            border-bottom: 3px solid var(--accent-color);
+        }
+        .toggle-receipt-details-btn {
+            background-color: var(--primary-color); color: white; border: none;
+            padding: 6px 10px; border-radius: 5px; cursor: pointer;
+            font-size: 0.9em; transition: background-color 0.2s ease;
+        }
+        .toggle-receipt-details-btn:hover { background-color: #004D40; }
+        .receipt-detail-row td {
+            background-color: #f0f8f8 !important;
+            padding: 0;
+            border-top: 1px dashed var(--light-gray);
+        }
+        .receipt-detail-content {
+            margin: 10px;
+            padding: 12px;
+            border-radius: 8px;
+            border: 2px solid var(--accent-color);
+            background-color: var(--secondary-color);
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.06);
+            text-align: left;
+        }
+        .receipt-detail-item {
+            font-size: 1.1em;
+            margin-bottom: 5px;
+            padding-left: 5px;
+            font-weight: 500;
+        }
+        .receipt-detail-item:last-child {
+            margin-bottom: 0;
+        }
+        .receipt-detail-item .student-name-colored {
+            font-weight: 700;
+        }
+        
+
+        #payment-summary {
+            background-color: #e8f5e9; color: var(--primary-color); padding: 15px;
+            margin-bottom: 25px; border-radius: 12px; text-align: center;
+            font-size: 1.3em; font-weight: 700; border-left: 6px solid var(--accent-color);
+            box-shadow: var(--shadow); display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header"><h1>ছাত্র ও শিক্ষক তথ্য</h1></div>
+
+    <div class="container">
+        
+        <div class="main-menu">
+            <div class="menu-item" onclick="showPage('teacher-list', this)">
+                 <span class="menu-icon">👨‍🏫</span><span>শিক্ষক তালিকা</span>
+            </div>
+            <div class="menu-item" onclick="showPage('student-list', this)">
+                 <span class="menu-icon">🎓</span><span>ছাত্র তালিকা</span>
+            </div>
+            <div class="menu-item active" id="dashboard-menu" onclick="showPage('dashboard', this)">
+                <span class="menu-icon">📊</span><span>ড্যাশবোর্ড</span>
+            </div>
+            <div class="menu-item" onclick="showPage('other-list', this)">
+                <span class="menu-icon">👥</span><span>অন্যান্য</span>
+            </div>
+            <div class="menu-item" onclick="showPage('results', this)">
+                 <span class="menu-icon">📝</span><span>ফলাফল</span>
+            </div>
+            <div class="menu-item" onclick="showPage('all-results', this)">
+                <span class="menu-icon">🏆</span><span>সকল ফলাফল</span>
+           </div>
+           <div class="menu-item" onclick="showPage('receipts', this)">
+                <span class="menu-icon">🧾</span><span>রশিদের হিসাব</span>
+            </div>
+        </div>
+
+        <div id="dashboard" class="page active">
+            <h2 class="page-title">ড্যাশবোর্ড</h2>
+            <div class="dashboard-grid">
+                <div class="card"><h3>মোট ছাত্র</h3><p id="totalStudents">০</p></div>
+                <div class="card"><h3>এ বছরের দানের পরিমাণ</h3><p id="thisYearDonation">৳০</p></div>
+                <div class="card"><h3>এই বছরের মোট আয়</h3><p id="thisYearPaid">৳০</p></div>
+                <div class="card"><h3>এই বছরে মোট ব্যয়</h3><p id="thisYearExpense">৳০</p></div>
+                <div class="card" id="netYearlyIncomeCard"><h3 >এই বছরের নীট আয়</h3><p id="netYearlyIncome">৳০</p></div>
+            </div>
+        </div>
+
+        <div id="student-list" class="page">
+            <h2 class="page-title">ছাত্রদের বেতনের তালিকা</h2>
+            <div class="controls-panel">
+                <h3>তালিকা ফিল্টার করুন</h3>
+                <h4 id="paymentYearDisplay" class="current-year-display"></h4>
+                <p class="instructions">প্রথমে বিভাগ ও শ্রেণী নির্বাচন করুন। তারপর প্রয়োজনে নাম বা ফরম নম্বর দিয়ে নির্দিষ্ট ছাত্রকে খুঁজুন।</p>
+                <div class="control-grid">
+                    <div class="control-item">
+                        <label for="studentDivisionFilter">বিভাগ নির্বাচন করুন</label>
+                        <select id="studentDivisionFilter">
+                            <option value="">--বিভাগ নির্বাচন--</option>
+                        </select>
+                    </div>
+                    <div class="control-item">
+                        <label for="studentClassFilter">শ্রেণী নির্বাচন করুন</label>
+                        <select id="studentClassFilter" disabled>
+                            <option value="">--আগে বিভাগ নির্বাচন করুন--</option>
+                        </select>
+                    </div>
+                    <div class="control-item">
+                        <label for="studentSearch">নাম বা ফরম নম্বর দিয়ে খুঁজুন</label>
+                        <input type="text" id="studentSearch" class="search-box" placeholder="এখানে টাইপ করুন...">
+                    </div>
+                </div>
+            </div>
+            <div id="payment-summary"></div>
+            <div class="student-payment-container">
+              <table id="studentPaymentTable">
+                  <thead>
+                    <tr>
+                      <th>ফরম : ছাত্রের নাম</th>
+                      <th>জানু</th><th>ফেব্রু</th><th>মার্চ</th><th>এপ্রি</th><th>মে</th><th>জুন</th>
+                      <th>জুলা</th><th>আগ</th><th>সেপ্টে</th><th>অক্টো</th><th>নভে</th><th>ডিসে</th>
+                      <th>মোট প্রদত্ত</th>
+                    </tr>
+                  </thead>
+                  <tbody></tbody>
+                  <tfoot></tfoot>
+              </table>
+            </div>
+        </div>
+
+        <div id="teacher-list" class="page">
+            <h2 class="page-title">শিক্ষক তালিকা</h2>
+            <div id="teacherCardContainer" class="card-grid"></div>
+        </div>
+
+        <div id="other-list" class="page">
+            <h2 class="page-title">অন্যান্য কর্মচারী তালিকা</h2>
+            <div style="overflow-x:auto;">
+              <table id="otherTable" class="data-table">
+                  <thead><tr><th>কর্মচারীর নাম</th><th>পদবি</th><th>মোবাইল নাম্বার</th><th>পূর্ণাঙ্গ ঠিকানা</th></tr></thead>
+                  <tbody></tbody>
+              </table>
+            </div>
+        </div>
+
+        <div id="results" class="page">
+            <h2 class="page-title">ফলাফল অনুসন্ধান</h2>
+            <div class="controls-panel">
+                <h3>ফলাফল খুঁজুন</h3>
+                <p class="instructions">প্রথমে বিভাগ, শ্রেণী ও পরীক্ষার ধরণ নির্বাচন করুন, তারপর তালিকা থেকে ছাত্র খুঁজুন।</p>
+                <div class="control-grid">
+                    <div class="control-item">
+                        <label for="resultDivisionFilter">বিভাগ নির্বাচন করুন</label>
+                        <select id="resultDivisionFilter">
+                             <option value="">--বিভাগ নির্বাচন--</option>
+                        </select>
+                    </div>
+                    <div class="control-item">
+                        <label for="resultClassFilter">শ্রেণী নির্বাচন করুন</label>
+                        <select id="resultClassFilter" disabled><option value="">--আগে বিভাগ নির্বাচন করুন--</option></select>
+                    </div>
+                    <div class="control-item">
+                        <label for="resultExamFilter">পরীক্ষার ধরণ নির্বাচন করুন</label>
+                        <select id="resultExamFilter">
+                            <option value="">--পরীক্ষা নির্বাচন--</option>
+                            <option value="প্রথম সাময়িক">প্রথম সাময়িক</option>
+                            <option value="দ্বিতীয় সাময়িক">দ্বিতীয় সাময়িক</option>
+                            <option value="বাৎসরিক">বাৎসরিক</option>
+                        </select>
+                    </div>
+                    <div class="control-item">
+                        <label for="resultStudentSearch">নাম বা ফরম নম্বর দিয়ে খুঁজুন</label>
+                        <input type="text" id="resultStudentSearch" class="search-box" placeholder="এখানে টাইপ করুন...">
+                    </div>
+                </div>
+            </div>
+            <div style="overflow-x:auto;">
+                <table id="studentResultSelectorTable" class="data-table">
+                    <thead><tr><th>ছাত্রের নাম</th><th>ফরম নং</th><th>শ্রেণী</th><th>কার্যক্রম</th></tr></thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+            <div id="result-display"></div>
+        </div>
+
+        <div id="all-results" class="page">
+            <h2 class="page-title">সকল ফলাফল</h2>
+            <div class="controls-panel">
+                <h3>ফলাফল ফিল্টার করুন</h3>
+                <p class="instructions">বিভাগ, শ্রেণী ও পরীক্ষার ধরণ নির্বাচন করে সকলের সম্মিলিত ফলাফল দেখুন।</p>
+                <div class="control-grid">
+                     <div class="control-item">
+                        <label for="allResultDivisionFilter">বিভাগ নির্বাচন করুন</label>
+                        <select id="allResultDivisionFilter">
+                            <option value="">--বিভাগ নির্বাচন--</option>
+                        </select>
+                    </div>
+                    <div class="control-item">
+                        <label for="allResultClassFilter">শ্রেণী নির্বাচন করুন</label>
+                        <select id="allResultClassFilter" disabled>
+                            <option value="">--আগে বিভাগ নির্বাচন করুন--</option>
+                        </select>
+                    </div>
+                    <div class="control-item">
+                        <label for="allResultExamFilter">পরীক্ষার ধরণ নির্বাচন করুন</label>
+                        <select id="allResultExamFilter">
+                            <option value="">--পরীক্ষা নির্বাচন--</option>
+                            <option value="প্রথম সাময়িক">প্রথম সাময়িক</option>
+                            <option value="দ্বিতীয় সাময়িক">দ্বিতীয় সাময়িক</option>
+                            <option value="বাৎসরিক">বাৎসরিক</option>
+                        </select>
+                    </div>
+                    <div class="control-item">
+                        <label style="opacity: 0;">প্রিন্ট বাটন</label>
+                        <button id="btnPrintResults" class="btn-view-result">🖨️ প্রিন্ট করুন</button>
+                    </div>
+                </div>
+            </div>
+            <div class="data-table-container" style="overflow-x:auto;">
+              <table id="allResultsTable" class="data-table">
+                  <thead></thead>
+                  <tbody></tbody>
+              </table>
+            </div>
+        </div>
+
+        <div id="receipts" class="page">
+            <h2 class="page-title">রশিদের হিসাব</h2>
+            <div class="controls-panel">
+                <h3>রশিদের তথ্য দেখুন</h3>
+                <p class="instructions">এখানে ছাত্রদের বেতনের রশিদ এবং দানের রশিদের হিসাব দেখা যাবে।</p>
+                <div class="control-grid">
+                    <div class="control-item">
+                        <label for="receiptTypeFilter">ধরণ নির্বাচন করুন</label>
+                        <select id="receiptTypeFilter">
+                            <option value="" selected disabled>-- ধরণ নির্বাচন করুন --</option>
+                            <option value="all">বেতন ও দান উভয়</option>
+                            <option value="payments">শুধুমাত্র বেতন</option>
+                            <option value="donations">শুধুমাত্র দান</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+            
+            <div id="receipts-display">
+                <h3 id="receipts-summary-heading" style="text-align: center; margin-bottom: 20px; color: var(--primary-color);"></h3>
+                <div style="overflow-x:auto;">
+                    <table id="receiptsTable" class="data-table">
+                        <thead>
+                            <!-- The header will be dynamically updated by renderReceiptsTable -->
+                        </thead>
+                        <tbody></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        </div>
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    
+    <script>
+        // --- Firebase Configuration ---
+        const firebaseConfig = {
+          apiKey: "AIzaSyB4NcA6dT4JoL1RT3N-5ZufTkjWtGPON50",
+          authDomain: "mboffer-7f093.firebaseapp.com",
+          databaseURL: "https://mboffer-7f093-default-rtdb.firebaseio.com",
+          projectId: "mboffer-7f093",
+          storageBucket: "mboffer-7f093.appspot.com",
+          messagingSenderId: "303535346191",
+          appId: "1:303535346191:web:193fdfc2d8976eb734497a"
+        };
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
+
+        // --- Global State ---
+        let allStudents = [], allTeachers = [], allResults = [], allOthers = [], allExpenses = [], allDonations = [];
+        const months = ["জানুয়ারি", "ফেব্রুয়ারি", "মার্চ", "এপ্রিল", "মে", "জুন", "জুলাই", "আগস্ট", "সেপ্টেম্বর", "অক্টোবর", "নভেম্বর", "ডিসেম্বর"];
+        
+        // --- Subject Maps for Different Divisions ---
+        const defaultSubjectMap = {
+            'arabic': 'আরবি লেখা', 'bangla': 'বাংলা', 'math': 'গণিত',
+            'english': 'ইংরেজি', 'environment': 'পরিবেশ পরিচিতি', 'tajweed_nurani': 'তাজবীদ ও মাখরাজ',
+            'kalima': 'কালিমা ও মাসালা', 'hadith': 'হাদীস শরীফ', 'salat': 'আদ:সালাত আদ:মাসুমুনা',
+            'quran': 'কুরআন শরীফ', 'tajweed': 'তাজবীদ', 'dua_masala': 'দোয়া ও মাসায়িল',
+            'quran_qaida': 'কুরআন শরীফ / কায়দা', 'nahbemir': 'নাহবেমীর',
+            'bangla_grammar': 'বাংলা ব্যাকরণ', 'ilmus_sarf': 'ইলমুচ্ছরফ',
+            'rawjatul_adab': 'রওজাতুল আদব', 'al_fiqhul_muyassar': 'আল ফিকহুল মুয়াচ্ছার',
+            'sirat': 'সিরাত', 'shahre_miate_amel': 'שহরে মিয়াতে আমেল',
+            'arbi_shikhi': 'এসো আরবি শিখি', 'urdu_qaida': 'উর্দু কায়দা',
+            'urdu_paheli': 'উর্দু পহেলি', 'taisirul_mubtadi': 'তাইসিরুল মুবতাদী',
+            'talimul_islam': 'তালিমুল ইসলাম', 'mizan': 'মিজান'
+        };
+        const nuraniSubjectMap = {
+            'arabic': 'আরবি লেখা', 'bangla': 'বাংলা', 'math': 'গণিত',
+            'english': 'ইংরেজি', 'environment': 'পরিবেশ পরিচিতি', 'tajweed_nurani': 'কুরআন ও তাজবীদ',
+            'kalima': 'কালিমা ও মাসায়েল', 'hadith': 'হাদীস শরীফ ও আসমাউল হুসনা', 'salat': 'আদ: সালাত ও আদ: মাসমুনা'
+        };
+        const SUBJECT_ORDER = [
+            'arabic', 'bangla', 'math', 'english', 'environment', 
+            'tajweed_nurani', 'kalima', 'hadith', 'salat', 'quran', 
+            'quran_qaida', 'tajweed', 'dua_masala', 'nahbemir', 'ilmus_sarf', 
+            'shahre_miate_amel', 'mizan', 'taisirul_mubtadi', 'arbi_shikhi', 
+            'rawjatul_adab', 'al_fiqhul_muyassar', 'urdu_qaida', 'urdu_paheli', 
+            'talimul_islam', 'bangla_grammar', 'sirat'
+        ];
+
+        function toBengaliNumber(enNumber) {
+            if (enNumber === null || enNumber === undefined || enNumber === '') return '';
+            const enStr = String(enNumber);
+            const bnDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+            return enStr.replace(/[0-9]/g, d => bnDigits[parseInt(d)]);
+        }
+
+        function normalizeNumber(inputNumber) {
+            if (inputNumber === null || inputNumber === undefined) return '';
+            const numStr = String(inputNumber);
+            const digitMap = { '০': '0', '১': '1', '২': '2', '৩': '3', '৪': '4', '৫': '5', '৬': '6', '৭': '7', '৮': '8', '৯': '9' };
+            return numStr.replace(/[০-৯]/g, d => digitMap[d]);
+        }
+
+        function showPage(pageId, element) {
+            document.querySelectorAll('.page').forEach(page => page.classList.remove('active'));
+            document.getElementById(pageId).classList.add('active');
+            if (element) {
+                document.querySelectorAll('.menu-item').forEach(item => item.classList.remove('active'));
+                element.classList.add('active');
+            }
+            refreshActivePage();
+        }
+
+        function refreshActivePage() {
+            const activePageId = document.querySelector('.page.active')?.id;
+            if (!activePageId) return;
+            const pageRenderActions = {
+                'dashboard': loadDashboard, 'student-list': renderStudentPaymentTable,
+                'teacher-list': renderTeacherCards, 'other-list': () => renderGenericTable('otherTable', allOthers, createOtherRow),
+                'results': displayStudentListForResults, 'all-results': displayAllResults,
+                'receipts': renderReceiptsTable
+            };
+            pageRenderActions[activePageId]?.();
+        }
+
+        function loadDashboard() {
+            const currentYear = new Date().getFullYear();
+            const filterByCurrentYear = (item, dateKey) => {
+                if (!item[dateKey]) return false;
+                try { return new Date(item[dateKey]).getFullYear() === currentYear; } catch (e) { return false; }
+            };
+            
+            let studentIncome = 0;
+            allStudents.forEach(student => {
+                if (student.payments && typeof student.payments === 'object') {
+                    Object.values(student.payments).forEach(p => {
+                        if (p && p.month && p.amount != null && String(p.amount).trim() !== '') {
+                             studentIncome += (parseInt(p.amount) || 0);
+                        }
+                    });
+                }
+            });
+
+            const donationIncome = allDonations.filter(d => filterByCurrentYear(d, 'donationDate')).reduce((total, d) => total + (parseInt(d.donationAmount) || 0), 0);
+            const yearTotalExpense = allExpenses.filter(e => filterByCurrentYear(e, 'expenseDate')).reduce((total, e) => total + (parseInt(e.expenseAmount) || 0), 0);
+            const totalYearlyIncome = studentIncome + donationIncome;
+            const netYearlyIncome = totalYearlyIncome - yearTotalExpense;
+            
+            document.getElementById('totalStudents').textContent = toBengaliNumber(allStudents.length);
+            document.getElementById('thisYearDonation').textContent = `৳${donationIncome.toLocaleString('bn-BD')}`;
+            document.getElementById('thisYearPaid').textContent = `৳${totalYearlyIncome.toLocaleString('bn-BD')}`;
+            document.getElementById('thisYearExpense').textContent = `৳${yearTotalExpense.toLocaleString('bn-BD')}`;
+            const netIncomeEl = document.getElementById('netYearlyIncome');
+            const netIncomeCard = document.getElementById('netYearlyIncomeCard');
+            netIncomeEl.textContent = `৳${netYearlyIncome.toLocaleString('bn-BD')}`;
+            const isLoss = netYearlyIncome < 0;
+            netIncomeCard.style.borderTopColor = isLoss ? 'var(--due-color)' : 'var(--primary-color)';
+            netIncomeEl.style.color = isLoss ? 'var(--due-color)' : '';
+        }
+        
+        function renderGenericTable(tableId, data, rowCreator) {
+            const tableBody = document.getElementById(tableId)?.querySelector('tbody');
+            if (!tableBody) return;
+            tableBody.innerHTML = '';
+            data.forEach(item => tableBody.appendChild(rowCreator(item)));
+        }
+
+        function createTeacherCard(teacher) {
+            const card = document.createElement('div');
+            card.className = 'teacher-card';
+            const teacherName = teacher.teacherName || 'নাম নেই';
+            const avatarLetter = teacherName.trim().length > 0 ? teacherName.trim()[0] : '?';
+            const phone = teacher.teacherPhone || 'দেওয়া নেই';
+            const phoneHTML = phone === 'দেওয়া নেই' ? phone : `<a href="tel:${phone.replace(/\s/g, '')}">${phone}</a>`;
+            card.innerHTML = `<div class="teacher-avatar">${avatarLetter}</div><h3>${teacherName}</h3><p class="teacher-role">${teacher.teacherRole || 'পদবী নেই'}</p><ul class="teacher-info"><li><span class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M6.62,10.79C8.06,13.62 10.38,15.94 13.21,17.38L15.41,15.18C15.69,14.9 16.08,14.82 16.43,14.93C17.55,15.3 18.75,15.5 20,15.5A1,1 0 0,1 21,16.5V20A1,1 0 0,1 20,21A17,17 0 0,1 3,4A1,1 0 0,1 4,3H7.5A1,1 0 0,1 8.5,4C8.5,5.25 8.7,6.45 9.07,7.57C9.18,7.92 9.1,8.31 8.82,8.59L6.62,10.79Z"></path></svg></span><span>${phoneHTML}</span></li><li><span class="info-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor"><path d="M12,11.5A2.5,2.5 0 0,1 9.5,9A2.5,2.5 0 0,1 12,6.5A2.5,2.5 0 0,1 14.5,9A2.5,2.5 0 0,1 12,11.5M12,2A7,7 0 0,0 5,9C5,14.25 12,22 12,22C12,22 19,14.25 19,9A7,7 0 0,0 12,2Z"></path></svg></span><span>${teacher.teacherAddress || 'দেওয়া নেই'}</span></li></ul>`;
+            return card;
+        }
+
+        function renderTeacherCards() {
+            const container = document.getElementById('teacherCardContainer');
+            if (!container) return;
+            container.innerHTML = '';
+            if (allTeachers.length === 0) {
+                container.innerHTML = '<p style="text-align:center; grid-column: 1 / -1;">কোনো শিক্ষকের তথ্য পাওয়া যায়নি।</p>';
+            } else {
+                allTeachers.forEach(teacher => container.appendChild(createTeacherCard(teacher)));
+            }
+        }
+        
+        function createOtherRow(other) {
+            const row = document.createElement('tr');
+            const phone = other.otherPhone || '';
+            const phoneHTML = phone ? `<a href="tel:${phone.replace(/\s/g, '')}">${phone}</a>` : '';
+            row.innerHTML = `<td>${other.otherName || ''}</td><td>${other.otherRole || ''}</td><td>${phoneHTML}</td><td>${other.otherAddress || ''}</td>`;
+            return row;
+        }
+        
+        function createStudentPaymentRow(student) {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td><span class="form-no">${toBengaliNumber(student.studentFormNumber || '')}</span> ${student.studentName}</td>`;
+            
+            let studentTotal = 0;
+            const paymentMap = new Map();
+            if (student.payments && typeof student.payments === 'object') {
+                Object.values(student.payments).forEach(p => {
+                    if (p && p.month) {
+                        const amount = parseInt(p.amount) || 0;
+                        if (amount > 0) {
+                            paymentMap.set(p.month, p);
+                            studentTotal += amount;
+                        }
+                    }
+                });
+            }
+
+            months.forEach(month => {
+                const payment = paymentMap.get(month);
+                const cell = row.insertCell();
+                cell.className = 'payment-cell';
+                if (payment) {
+                    cell.innerHTML = `৳${(parseInt(payment.amount) || 0).toLocaleString('bn-BD')}<small>রশিদ: ${toBengaliNumber(payment.receiptNo || '')}</small>`;
+                    cell.classList.add('status-paid');
+                } else {
+                    cell.textContent = '❌';
+                    cell.classList.add('status-due');
+                }
+            });
+            
+            const totalCell = row.insertCell();
+            totalCell.innerHTML = `৳${studentTotal.toLocaleString('bn-BD')}`;
+            
+            return row;
+        }
+        
+        function renderStudentPaymentTable() {
+            const currentYear = new Date().getFullYear();
+            const paymentYearDisplayEl = document.getElementById('paymentYearDisplay');
+            if (paymentYearDisplayEl) { paymentYearDisplayEl.textContent = `বেতন বর্ষঃ ${toBengaliNumber(currentYear)}`; }
+            
+            const divisionFilter = document.getElementById('studentDivisionFilter').value;
+            const classFilter = document.getElementById('studentClassFilter').value;
+            const tableBody = document.getElementById('studentPaymentTable').querySelector('tbody');
+            const tableFoot = document.getElementById('studentPaymentTable').querySelector('tfoot');
+            const summaryEl = document.getElementById('payment-summary');
+
+            const searchTerm = document.getElementById('studentSearch').value.trim();
+            const normalizedSearchTerm = normalizeNumber(searchTerm);
+
+            tableBody.innerHTML = '';
+            tableFoot.innerHTML = ''; 
+            
+            if (!divisionFilter || !classFilter) {
+                tableBody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding: 40px;">অনুগ্রহ করে প্রথমে বিভাগ এবং শ্রেণী নির্বাচন করুন।</td></tr>`;
+                summaryEl.style.display = 'none';
+                return;
+            }
+
+            const filtered = allStudents.filter(s =>
+                s.studentDivision === divisionFilter &&
+                s.studentClass === classFilter && 
+                (!searchTerm || 
+                    s.studentName.toLowerCase().includes(searchTerm.toLowerCase()) || 
+                    String(s.studentFormNumber).includes(normalizedSearchTerm)
+                )
+            );
+
+            if (filtered.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="14" style="text-align:center; padding: 40px;">এই ফিল্টারে কোনো ছাত্র পাওয়া যায়নি।</td></tr>`;
+                summaryEl.style.display = 'none';
+                return;
+            }
+
+            const monthlyTotals = {};
+            months.forEach(month => { monthlyTotals[month] = 0; });
+            
+            filtered.forEach(student => {
+                if (student.payments && typeof student.payments === 'object') {
+                    Object.values(student.payments).forEach(payment => {
+                        const amount = parseInt(payment.amount) || 0;
+                        if (payment.month && monthlyTotals.hasOwnProperty(payment.month)) {
+                            monthlyTotals[payment.month] += amount;
+                        }
+                    });
+                }
+            });
+            
+            const grandTotal = Object.values(monthlyTotals).reduce((sum, total) => sum + total, 0);
+
+            summaryEl.innerHTML = `নির্বাচিত শ্রেণীর মোট আদায়কৃত বেতন: ৳${grandTotal.toLocaleString('bn-BD')}`;
+            summaryEl.style.display = 'block';
+
+            renderGenericTable('studentPaymentTable', filtered, createStudentPaymentRow);
+
+            let footerHTML = '<tr><td colspan="1" style="text-align:right;">মাসিক মোট:</td>';
+            months.forEach(month => {
+                const total = monthlyTotals[month];
+                footerHTML += `<td>৳${total.toLocaleString('bn-BD')}</td>`;
+            });
+            footerHTML += `<td>৳${grandTotal.toLocaleString('bn-BD')}</td>`;
+            footerHTML += '</tr>';
+            tableFoot.innerHTML = footerHTML;
+        }
+
+        function populateDivisionFilters() {
+            const divisions = [...new Set(allStudents.map(s => s.studentDivision).filter(Boolean))].sort();
+            const filters = [
+                document.getElementById('studentDivisionFilter'),
+                document.getElementById('resultDivisionFilter'),
+                document.getElementById('allResultDivisionFilter')
+            ];
+            filters.forEach(filter => {
+                if (!filter) return;
+                const currentValue = filter.value;
+                filter.innerHTML = `<option value="">--বিভাগ নির্বাচন--</option>`;
+                divisions.forEach(divisionName => filter.add(new Option(divisionName, divisionName)));
+                filter.value = currentValue;
+            });
+        }
+
+        function updateClassFilterOptions(divisionFilterId, classFilterId) {
+            const divisionFilter = document.getElementById(divisionFilterId);
+            const classFilter = document.getElementById(classFilterId);
+            if (!divisionFilter || !classFilter) return;
+            const selectedDivision = divisionFilter.value;
+            classFilter.innerHTML = ''; 
+            if (selectedDivision) {
+                const classes = [...new Set(allStudents.filter(s => s.studentDivision === selectedDivision && s.studentClass).map(s => s.studentClass))].sort();
+                classFilter.disabled = false;
+                classFilter.innerHTML = `<option value="">--শ্রেণী/গ্রুপ নির্বাচন--</option>`;
+                classes.forEach(className => classFilter.add(new Option(className, className)));
+            } else {
+                classFilter.disabled = true;
+                classFilter.innerHTML = '<option value="">--আগে বিভাগ নির্বাচন করুন--</option>';
+            }
+        }
+
+        function createResultSelectorRow(student) {
+            const row = document.createElement('tr');
+            row.innerHTML = `<td>${student.studentName}</td><td>${toBengaliNumber(student.studentFormNumber || '')}</td><td>${student.studentClass}</td><td style="text-align:center;"><button class="btn-view-result" onclick="viewStudentResult('${student.id}')">ফলাফল দেখুন</button></td>`;
+            return row;
+        }
+        
+        function displayStudentListForResults() {
+            const divisionFilter = document.getElementById('resultDivisionFilter').value;
+            const classFilter = document.getElementById('resultClassFilter').value;
+            const examType = document.getElementById('resultExamFilter').value;
+            const searchTerm = document.getElementById('resultStudentSearch').value.toLowerCase().trim();
+            const tableBody = document.getElementById('studentResultSelectorTable').querySelector('tbody');
+            document.getElementById('result-display').style.display = 'none';
+
+            if (!divisionFilter || !classFilter || !examType) {
+                tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">অনুগ্রহ করে বিভাগ, শ্রেণী এবং পরীক্ষার ধরণ নির্বাচন করুন।</td></tr>';
+                return;
+            }
+
+            const studentsInClass = allStudents.filter(s => s.studentDivision === divisionFilter && s.studentClass === classFilter);
+            const filteredStudents = studentsInClass.filter(s => !searchTerm || s.studentName.toLowerCase().includes(searchTerm) || String(s.studentFormNumber).includes(searchTerm));
+            const resultsInClass = allResults.filter(r => r.examType === examType && studentsInClass.some(s => s.id === r.studentId));
+            
+            resultsInClass.forEach(result => {
+                const { totalMarks } = calculateGradeInfo(result);
+                result.calculatedTotalMarks = totalMarks;
+            });
+            resultsInClass.sort((a, b) => b.calculatedTotalMarks - a.calculatedTotalMarks);
+
+            let rank = 0, lastMark = -1;
+            resultsInClass.forEach((result, index) => {
+                if (result.calculatedTotalMarks !== lastMark) { rank = index + 1; lastMark = result.calculatedTotalMarks; }
+                result.position = rank;
+            });
+
+            if (filteredStudents.length === 0) {
+                tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">কোনো ছাত্র পাওয়া যায়নি।</td></tr>';
+            } else {
+                renderGenericTable('studentResultSelectorTable', filteredStudents, createResultSelectorRow);
+            }
+        }
+
+        const gradeSystem = { 'A+': { min: 80, point: 5.0 }, 'A': { min: 70, point: 4.0 }, 'A-': { min: 60, point: 3.5 }, 'B': { min: 50, point: 3.0 }, 'C': { min: 40, point: 2.0 }, 'D': { min: 33, point: 1.0 }, 'F': { min: 0, point: 0.0 } };
+        
+        function calculateGradeInfo(result) {
+            const student = allStudents.find(s => s.id === result.studentId);
+            const activeSubjectMap = (student && student.studentDivision === 'নূরানী বিভাগ') ? nuraniSubjectMap : defaultSubjectMap;
+            
+            const subjectsWithMarks = Object.keys(result)
+                .filter(key => activeSubjectMap[key] && result[key] != null && String(result[key]).trim() !== '')
+                .map(key => ({ mark: result[key], point: (Object.values(gradeSystem).find(g => (parseInt(result[key]) || 0) >= g.min) || gradeSystem.F).point }));
+            
+            let averageMarks = null;
+            if (subjectsWithMarks.length === 0) return { finalGrade: 'N/A', isFail: false, totalMarks: 0, gpa: 0.0, averageMarks };
+            
+            const totalMarks = subjectsWithMarks.reduce((sum, s) => sum + (parseInt(s.mark) || 0), 0);
+            
+            if (student && ['কিতাব বিভাগ', 'হেফজ বিভাগ', 'নাজেরা বিভাগ'].includes(student.studentDivision)) {
+                averageMarks = totalMarks / subjectsWithMarks.length;
+            }
+
+            const isFail = subjectsWithMarks.some(s => s.point === 0.0);
+            if (isFail) return { finalGrade: 'F', isFail: true, totalMarks, gpa: 0.0, averageMarks };
+
+            const totalPoints = subjectsWithMarks.reduce((sum, s) => sum + s.point, 0); 
+            const gpa = totalPoints / subjectsWithMarks.length;
+
+            let finalGrade = 'F';
+            if (gpa >= 4.99) finalGrade = 'A+'; else if (gpa >= 4.0) finalGrade = 'A';
+            else if (gpa >= 3.5) finalGrade = 'A-'; else if (gpa >= 3.0) finalGrade = 'B';
+            else if (gpa >= 2.0) finalGrade = 'C'; else if (gpa >= 1.0) finalGrade = 'D';
+            return { finalGrade, isFail, totalMarks, gpa, averageMarks };
+        }
+
+        function viewStudentResult(studentId) {
+            const examType = document.getElementById('resultExamFilter').value;
+            const student = allStudents.find(s => s.id === studentId);
+            const result = allResults.find(r => r.studentId === studentId && r.examType === examType);
+            const resultDisplay = document.getElementById('result-display');
+
+            if (!student) {
+                resultDisplay.innerHTML = `<div class="result-card"><div class="result-header"><h3>ছাত্রের তথ্য পাওয়া যায়নি</h3></div><div style="padding: 30px; text-align: center;">এই ছাত্রের কোনো তথ্য খুঁজে পাওয়া যায়নি।</div></div>`;
+                resultDisplay.style.display = 'block';
+                resultDisplay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
+            
+            const activeSubjectMap = (student && student.studentDivision === 'নূরানী বিভাগ') ? nuraniSubjectMap : defaultSubjectMap;
+
+            if (!result) {
+                resultDisplay.innerHTML = `<div class="result-card"><div class="result-header"><h3>${student.studentName}</h3><p>(${examType}) পরীক্ষার ফলাফল</p></div><div style="padding: 30px; text-align: center;">এই পরীক্ষার কোনো ফলাফল পাওয়া যায়নি।</div></div>`;
+            } else {
+                const { finalGrade, isFail, totalMarks, gpa, averageMarks } = calculateGradeInfo(result);
+                const gpaText = isFail ? 'F' : `${toBengaliNumber(gpa.toFixed(2))} (${finalGrade})`;
+                let subjectsHTML = '';
+
+                subjectsHTML += `<div class="subject-item" style="background-color: var(--primary-color); color: white; font-weight: bold;"><span class="subject-item-name">বিষয়</span><span class="subject-item-mark">নম্বর</span><span class="subject-item-grade">গ্রেড</span></div>`;
+                
+                SUBJECT_ORDER.forEach(key => {
+                    if (activeSubjectMap[key] && result[key] != null && String(result[key]).trim() !== '') {
+                        const mark = parseInt(result[key]) || 0;
+                        const grade = (Object.entries(gradeSystem).find(([g, d]) => mark >= d.min) || ['F'])[0];
+                        subjectsHTML += `<div class="subject-item">
+                                           <span class="subject-item-name">${activeSubjectMap[key]}</span>
+                                           <span class="subject-item-mark">${toBengaliNumber(mark)}</span>
+                                           <span class="subject-item-grade ${grade === 'F' ? 'fail-grade' : ''}">${grade}</span>
+                                        </div>`;
+                    }
+                });
+
+                let summaryHTML = `<div class="summary-item"><span class="label">GPA</span><span class="value gpa-value">${gpaText}</span></div><div class="summary-item"><span class="label">মোট নম্বর</span><span class="value">${toBengaliNumber(totalMarks)}</span></div>`;
+                if (averageMarks !== null) { summaryHTML += `<div class="summary-item"><span class="label">গড়</span><span class="value">${toBengaliNumber(averageMarks.toFixed(2))}</span></div>`; }
+                summaryHTML += `<div class="summary-item"><span class="label">অবস্থান</span><span class="value">${toBengaliNumber(result.position || 'N/A')}</span></div>`;
+
+                resultDisplay.innerHTML = `<div class="result-card"><div class="result-header"><h3>${student.studentName}</h3><p>(${examType}) পরীক্ষার ফলাফল</p></div><div class="result-summary">${summaryHTML}</div><div class="subject-grid">${subjectsHTML}</div></div>`;
+            }
+            resultDisplay.style.display = 'block';
+            resultDisplay.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        // MODIFIED FUNCTION: All user requests implemented here
+        function displayAllResults() {
+            const divisionFilter = document.getElementById('allResultDivisionFilter').value;
+            const classFilter = document.getElementById('allResultClassFilter').value;
+            const examType = document.getElementById('allResultExamFilter').value;
+            const table = document.getElementById('allResultsTable');
+            const tableHead = table.querySelector('thead');
+            const tableBody = table.querySelector('tbody');
+
+            tableHead.innerHTML = ''; tableBody.innerHTML = '';
+            if (!divisionFilter || !classFilter || !examType) {
+                tableHead.innerHTML = '<tr><th>বার্তা</th></tr>';
+                tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">অনুগ্রহ করে প্রথমে বিভাগ, শ্রেণী এবং পরীক্ষার ধরণ নির্বাচন করুন।</td></tr>';
+                return;
+            }
+            
+            const activeSubjectMap = (divisionFilter === 'নূরানী বিভাগ') ? nuraniSubjectMap : defaultSubjectMap;
+            const studentsInClass = allStudents.filter(s => s.studentDivision === divisionFilter && s.studentClass === classFilter);
+            let resultsWithInfo = allResults
+                .filter(r => r.examType === examType && studentsInClass.some(s => s.id === r.studentId))
+                .map(result => {
+                    const student = studentsInClass.find(s => s.id === result.studentId) || {};
+                    const { finalGrade, totalMarks, averageMarks } = calculateGradeInfo(result);
+                    return { ...result, studentName: student.studentName, studentFormNumber: student.studentFormNumber, numericFormNumber: parseInt(student.studentFormNumber) || Infinity, totalMarks, finalGrade, averageMarks };
+                });
+
+            resultsWithInfo.sort((a, b) => b.totalMarks - a.totalMarks);
+            let rank = 0, lastMark = -1;
+            resultsWithInfo.forEach((result, index) => {
+                if (result.totalMarks !== lastMark) { rank = index + 1; lastMark = result.totalMarks; }
+                result.position = rank;
+            });
+            resultsWithInfo.sort((a, b) => a.numericFormNumber - b.numericFormNumber);
+
+            const allSubjectsPresent = new Set(resultsWithInfo.flatMap(r => Object.keys(r)).filter(key => activeSubjectMap[key]));
+            const subjectsInThisResult = SUBJECT_ORDER.filter(key => allSubjectsPresent.has(key));
+            
+            const showAverage = ['কিতাব বিভাগ', 'হেফজ বিভাগ', 'নাজেরা বিভাগ'].includes(divisionFilter);
+            
+            let headerHTML = '<th class="th-form-no">ফরম নং</th><th class="th-student-name">ছাত্রের নাম</th>';
+            subjectsInThisResult.forEach(key => headerHTML += `<th class="th-subject">${activeSubjectMap[key]}</th>`);
+            headerHTML += `<th class="th-focus">মোট নম্বর</th>`;
+            if (showAverage) { headerHTML += `<th class="th-focus">গড়</th>`; }
+            headerHTML += `<th class="th-focus">গ্রেড</th><th class="th-focus">অবস্থান</th>`;
+            tableHead.innerHTML = `<tr>${headerHTML}</tr>`;
+
+            if (resultsWithInfo.length === 0) {
+                 const colspan = showAverage ? 5 + subjectsInThisResult.length : 4 + subjectsInThisResult.length;
+                 tableBody.innerHTML = `<tr><td colspan="${colspan}" style="text-align:center;">এই ফিল্টারে কোনো ফলাফল পাওয়া যায়নি।</td></tr>`;
+                 return;
+            }
+
+            resultsWithInfo.forEach(res => {
+                let rowHTML = `<td class="td-form-no" style="text-align:center;">${toBengaliNumber(res.studentFormNumber)}</td><td class="td-student-name">${res.studentName}</td>`;
+                subjectsInThisResult.forEach(key => {
+                    const mark = res[key];
+                    // If mark is null, undefined, or an empty string, display '❌', otherwise display the number.
+                    const displayValue = (mark != null && String(mark).trim() !== '') 
+                        ? toBengaliNumber(mark) 
+                        : '<span style="color: var(--due-color);">❌</span>';
+                    rowHTML += `<td class="td-subject" style="text-align:center;">${displayValue}</td>`;
+                });
+                rowHTML += `<td class="td-focus" style="text-align:center; font-weight:600;">${toBengaliNumber(res.totalMarks)}</td>`;
+                if(showAverage) { rowHTML += `<td class="td-focus" style="text-align:center; font-weight:600;">${res.averageMarks ? toBengaliNumber(res.averageMarks.toFixed(2)) : '—'}</td>`; }
+                rowHTML += `<td class="td-focus" style="text-align:center; font-weight:600; color: ${res.finalGrade === 'F' ? 'var(--due-color)' : 'var(--paid-color)'}">${res.finalGrade}</td>`;
+                rowHTML += `<td class="td-focus" style="text-align:center; font-weight:600;">${toBengaliNumber(res.position)}</td>`;
+                tableBody.insertRow().innerHTML = rowHTML;
+            });
+        }
+        
+        function printResults() {
+            const classFilterEl = document.getElementById('allResultClassFilter');
+            const examFilterEl = document.getElementById('allResultExamFilter');
+            const table = document.getElementById('allResultsTable');
+            const tableBody = table.querySelector('tbody');
+
+            if (!classFilterEl.value || !examFilterEl.value || tableBody.rows.length === 0 || tableBody.rows[0].cells.length <= 1) {
+                alert('প্রিন্ট করার জন্য কোনো ডেটা নেই। অনুগ্রহ করে প্রথমে শ্রেণী এবং পরীক্ষার ধরণ নির্বাচন করুন।');
+                return;
+            }
+
+            const className = classFilterEl.options[classFilterEl.selectedIndex].text;
+            const examName = examFilterEl.options[examFilterEl.selectedIndex].text;
+            const printTitle = `ফলাফল - ${className} (${examName})`;
+            const tableHTML = table.outerHTML;
+            const today = new Date().toLocaleDateString('bn-BD', { day: 'numeric', month: 'long', year: 'numeric' });
+
+            const printWindow = window.open('', '_blank');
+            if (!printWindow) {
+                alert('পপ-আপ ব্লক করা হয়েছে। প্রিন্ট করার জন্য দয়া করে এই সাইটের জন্য পপ-আপ অনুমতি দিন।');
+                return;
+            }
+
+            const htmlContent = `
+                <html><head><title>${printTitle}</title>
+                    <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+                    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Bengali:wght@400;500;600;700&display=swap" rel="stylesheet">
+                    <style>
+                        body { font-family: 'Noto Sans Bengali', sans-serif; margin: 0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                        .print-container { padding: 10px; }
+                        .print-header { text-align: center; margin-bottom: 20px; border-bottom: 2px solid #333; padding-bottom: 10px; }
+                        .print-header h1 { margin: 0; font-size: 22pt; color: #00695C; font-weight: 700; }
+                        .print-header h2 { margin: 5px 0 0 0; font-size: 15pt; font-weight: 600; }
+                        .print-header p { margin: 5px 0 0 0; font-size: 10pt; }
+                        table { width: 100%; border-collapse: collapse; font-size: 9pt; table-layout: fixed; page-break-inside: auto; }
+                        thead { display: table-header-group; }
+                        tbody { display: table-row-group; }
+                        tr { page-break-inside: avoid !important; }
+                        th, td { border: 1px solid #888; padding: 6px 4px; text-align: center; word-wrap: break-word; }
+                        th { background-color: #E0E0E0 !important; font-weight: 600; font-size: 10pt; }
+                        tbody tr:nth-child(even) { background-color: #f2f2f2 !important; }
+                        .th-student-name, .td-student-name { width: 25% !important; text-align: left !important; padding-left: 8px !important; }
+                        .th-form-no, .td-form-no { width: 8% !important; }
+                        th.th-focus { background-color: #004D40 !important; color: white !important; }
+                        td.td-focus { font-weight: 700 !important; background-color: #e0f2f1 !important; color: #000 !important; }
+                        @page { size: A4 landscape; margin: 0.8cm; }
+                    </style>
+                </head><body><div class="print-container">
+                        <div class="print-header"><h1>মোবারকপুর দারুল উলুম কওমি মাদ্রাসা ও এতিমখানা</h1><h2>${printTitle}</h2><p>প্রকাশের তারিখ: ${today}</p></div>
+                        ${tableHTML}
+                </div></body></html>`;
+            
+            printWindow.document.open();
+            printWindow.document.write(htmlContent);
+            printWindow.document.close();
+            printWindow.onload = function() { printWindow.focus(); printWindow.print(); };
+        }
+
+        function renderReceiptsTable() {
+            const tableBody = document.getElementById('receiptsTable').querySelector('tbody');
+            const typeFilter = document.getElementById('receiptTypeFilter').value;
+            const summaryHeading = document.getElementById('receipts-summary-heading');
+            
+            tableBody.innerHTML = ''; summaryHeading.textContent = '';
+            const tableHead = document.getElementById('receiptsTable').querySelector('thead');
+            tableHead.innerHTML = `<tr><th>রশিদ নং</th><th>ধরণ</th><th>সংখ্যা</th><th>পরিমাণ</th><th>বিস্তারিত</th></tr>`;
+
+            if (typeFilter === "") {
+                tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">দয়া করে একটি ধরণ নির্বাচন করুন।</td></tr>`; return;
+            }
+            
+            let allReceiptsToDisplay = [];
+            let currentTotalDisplayedAmount = 0;
+
+            if (typeFilter === 'all' || typeFilter === 'payments') {
+                const groupedPayments = new Map();
+                allStudents.forEach(student => {
+                    if (student.payments && typeof student.payments === 'object') {
+                        Object.values(student.payments).forEach(payment => {
+                            const rawReceiptNo = payment.receiptNo;
+                            if (rawReceiptNo != null && String(rawReceiptNo).trim() !== '' && payment.amount != null && String(payment.amount).trim() !== '') {
+                                const normalizedKey = normalizeNumber(rawReceiptNo);
+                                const amount = parseInt(payment.amount) || 0;
+                                if (!groupedPayments.has(normalizedKey)) {
+                                    groupedPayments.set(normalizedKey, {
+                                        displayReceiptNo: rawReceiptNo, totalAmount: 0,
+                                        details: [], count: 0
+                                    });
+                                }
+                                const entry = groupedPayments.get(normalizedKey);
+                                entry.totalAmount += amount;
+                                entry.count++;
+                                entry.details.push({
+                                    studentName: student.studentName || 'অজ্ঞাত ছাত্র',
+                                    month: payment.month || 'অজ্ঞাত মাস'
+                                });
+                            }
+                        });
+                    }
+                });
+                groupedPayments.forEach(entry => {
+                    allReceiptsToDisplay.push({
+                        receiptNo: entry.displayReceiptNo, amount: entry.totalAmount,
+                        type: 'বেতন', details: entry.details, count: entry.count 
+                    });
+                    currentTotalDisplayedAmount += entry.totalAmount;
+                });
+            }
+
+            if (typeFilter === 'all' || typeFilter === 'donations') {
+                allDonations.forEach(donation => {
+                    if (donation.donationReceipt != null && String(donation.donationReceipt).trim() !== '') {
+                        const amount = parseInt(donation.donationAmount) || 0;
+                        allReceiptsToDisplay.push({
+                            receiptNo: donation.donationReceipt, amount: amount,
+                            type: 'দান', details: donation.donationDescription || 'অজ্ঞাত দাতা', count: 1
+                        });
+                        currentTotalDisplayedAmount += amount;
+                    }
+                });
+            }
+            
+            allReceiptsToDisplay.sort((a, b) => {
+                if (a.count !== b.count) {
+                    return a.count - b.count;
+                }
+                return (parseInt(normalizeNumber(a.receiptNo)) || 0) - (parseInt(normalizeNumber(b.receiptNo)) || 0);
+            });
+            
+            if (allReceiptsToDisplay.length === 0) {
+                tableBody.innerHTML = `<tr><td colspan="5" style="text-align:center;">এই ফিল্টারের জন্য কোনো রশিদ পাওয়া যায়নি।</td></tr>`;
+            } else {
+                const nameColors = ['#C62828', '#283593', '#00695C', '#F9A825', '#6A1B9A', '#0277BD', '#558B2F', '#D84315', '#4E342E', '#424242'];
+                const studentColorMap = new Map();
+                let colorIndex = 0;
+
+                allReceiptsToDisplay.forEach((receipt, index) => {
+                    const mainRow = document.createElement('tr');
+                    const detailRowId = `receipt-details-${normalizeNumber(receipt.receiptNo)}-${index}`;
+                    
+                    mainRow.innerHTML = `<td style="text-align:center;">${toBengaliNumber(receipt.receiptNo)}</td><td style="text-align:center;">${receipt.type}</td><td style="text-align:center;">${toBengaliNumber(receipt.count)}</td><td style="text-align:center;">৳${receipt.amount.toLocaleString('bn-BD')}</td><td style="text-align:center;"><button class="toggle-receipt-details-btn" data-target-id="${detailRowId}">➕ দেখুন</button></td>`;
+                    tableBody.appendChild(mainRow);
+                    
+                    const detailRow = document.createElement('tr');
+                    detailRow.id = detailRowId; detailRow.style.display = 'none';
+                    detailRow.classList.add('receipt-detail-row');
+                    const detailCell = document.createElement('td');
+                    detailCell.colSpan = 5;
+
+                    let detailHTML = '<div class="receipt-detail-content">';
+                    if(receipt.type === 'বেতন' && Array.isArray(receipt.details)) {
+                        receipt.details.forEach(detail => {
+                            let color = studentColorMap.get(detail.studentName);
+                            if(!color) {
+                                color = nameColors[colorIndex % nameColors.length];
+                                studentColorMap.set(detail.studentName, color);
+                                colorIndex++;
+                            }
+                            detailHTML += `<div class="receipt-detail-item"><span class="student-name-colored" style="color:${color};">${detail.studentName}</span> (${detail.month})</div>`;
+                        });
+                    } else {
+                        detailHTML += `<div class="receipt-detail-item">${receipt.details}</div>`;
+                    }
+                    detailHTML += '</div>';
+
+                    detailCell.innerHTML = detailHTML;
+                    detailRow.appendChild(detailCell);
+                    tableBody.appendChild(detailRow);
+                });
+
+                document.querySelectorAll('.toggle-receipt-details-btn').forEach(button => {
+                    button.addEventListener('click', function() {
+                        const targetId = this.dataset.targetId;
+                        const detailRow = document.getElementById(targetId);
+                        if (detailRow) {
+                            const isHidden = detailRow.style.display === 'none';
+                            detailRow.style.display = isHidden ? 'table-row' : 'none';
+                            this.innerHTML = isHidden ? '➖ লুকান' : '➕ দেখুন';
+                        }
+                    });
+                });
+                summaryHeading.textContent = `মোট প্রাপ্তি: ৳${currentTotalDisplayedAmount.toLocaleString('bn-BD')}`;
+            }
+        }
+        
+        function listenToDatabase(dbRefName, targetArray, ...updateFns) {
+             db.ref(dbRefName).on('value', (snapshot) => {
+                const data = snapshot.val() || {};
+                targetArray.length = 0; 
+                Object.keys(data).forEach(id => targetArray.push({ id, ...data[id] }));
+                if (dbRefName === 'students') {
+                    targetArray.forEach(student => {
+                        if (student.studentClass === 'প্রথম শ্রেণী') { student.studentClass = 'প্রথম শ্রেণী ( ক )'; }
+                    });
+                    targetArray.sort((a, b) => (Number(a.studentFormNumber) || Infinity) - (Number(b.studentFormNumber) || Infinity));
+                }
+                updateFns.forEach(fn => fn());
+                refreshActivePage();
+            });
+        }
+        
+        function setupEventListeners() {
+            document.getElementById('studentDivisionFilter').addEventListener('change', () => {
+                updateClassFilterOptions('studentDivisionFilter', 'studentClassFilter');
+                renderStudentPaymentTable();
+            });
+            document.getElementById('resultDivisionFilter').addEventListener('change', () => {
+                updateClassFilterOptions('resultDivisionFilter', 'resultClassFilter');
+                displayStudentListForResults();
+            });
+            document.getElementById('allResultDivisionFilter').addEventListener('change', () => {
+                updateClassFilterOptions('allResultDivisionFilter', 'allResultClassFilter');
+                displayAllResults();
+            });
+            document.getElementById('studentClassFilter').addEventListener('change', renderStudentPaymentTable);
+            document.getElementById('studentSearch').addEventListener('input', renderStudentPaymentTable);
+            document.getElementById('resultClassFilter').addEventListener('change', displayStudentListForResults);
+            document.getElementById('resultExamFilter').addEventListener('change', displayStudentListForResults);
+            document.getElementById('resultStudentSearch').addEventListener('input', displayStudentListForResults);
+            document.getElementById('allResultClassFilter').addEventListener('change', displayAllResults);
+            document.getElementById('allResultExamFilter').addEventListener('change', displayAllResults);
+            document.getElementById('btnPrintResults').addEventListener('click', printResults);
+            document.getElementById('receiptTypeFilter').addEventListener('change', renderReceiptsTable);
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            setupEventListeners();
+            listenToDatabase('students', allStudents, populateDivisionFilters, loadDashboard);
+            listenToDatabase('teachers', allTeachers);
+            listenToDatabase('others', allOthers);
+            listenToDatabase('results', allResults);
+            listenToDatabase('expenses', allExpenses, loadDashboard);
+            listenToDatabase('donations', allDonations, loadDashboard, renderReceiptsTable);
+        });
+    </script>
+</body>
+</html>
