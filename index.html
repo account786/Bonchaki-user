@@ -1,3 +1,5 @@
+--- START OF FILE index.html ---
+
 <!DOCTYPE html>
 <html lang="bn">
 <head>
@@ -277,10 +279,10 @@
         }
         .btn-view-result:hover { background-color: #004D40; }
         
-        /* === MODIFICATION START: ALL RESULTS TABLE STYLES === */
+        /* === ALL RESULTS TABLE STYLES === */
         .data-table-container {
             border-radius: 12px;
-            box-shadow: 0 6px 20px rgba(0,0,0,0.1); /* Black shadow */
+            box-shadow: 0 6px 20px rgba(0,0,0,0.1); 
             overflow: hidden;
             border: 1px solid var(--light-gray);
         }
@@ -317,10 +319,9 @@
         #allResultsTable th.th-focus {
              width: 8%;
              font-weight: 700 !important;
-             background-color: #004D40 !important; /* Darker shade of primary */
+             background-color: #004D40 !important; 
              color: var(--white) !important;
         }
-        /* === MODIFICATION END === */
 
         /* --- Control Panel Styles --- */
         .controls-panel {
@@ -392,8 +393,8 @@
         .subject-grid {
             display: flex;
             flex-direction: column;
-            gap: 4px; /* Reduced gap */
-            padding: 15px; /* Reduced padding */
+            gap: 4px; 
+            padding: 15px; 
         }
         .subject-item {
             display: flex;
@@ -403,7 +404,7 @@
             padding: 0 15px;
             border-radius: 8px;
             border: 1px solid var(--light-gray);
-            min-height: 40px; /* Reduced height */
+            min-height: 40px; 
             transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
         }
         .subject-item:hover { 
@@ -412,14 +413,14 @@
             border-color: var(--primary-color);
         }
         .subject-item-name {
-            font-size: 1em; /* Reduced font size */
+            font-size: 1em; 
             color: var(--primary-color);
             font-weight: 600;
             flex: 3;
             text-align: left;
         }
         .subject-item-mark, .subject-item-grade {
-            font-size: 0.95em; /* Reduced font size */
+            font-size: 0.95em; 
             font-weight: 500;
             text-align: center;
             flex: 1;
@@ -479,8 +480,8 @@
         }
         #receiptsTable th, #receiptsTable td { text-align: center; }
         #receiptsTable thead th {
-            background-color: #004D40; /* Darker Islamic Green */
-            color: var(--accent-color); /* Golden text */
+            background-color: #004D40; 
+            color: var(--accent-color); 
             font-size: 1.1em;
             border-bottom: 3px solid var(--accent-color);
         }
@@ -649,14 +650,14 @@
                         </select>
                     </div>
                     <div class="control-item">
-                        <label for="resultStudentSearch">নাম বা ফরম নম্বর দিয়ে খুঁজুন</label>
+                        <label for="resultStudentSearch">নাম বা রোল নম্বর দিয়ে খুঁজুন</label>
                         <input type="text" id="resultStudentSearch" class="search-box" placeholder="এখানে টাইপ করুন...">
                     </div>
                 </div>
             </div>
             <div style="overflow-x:auto;">
                 <table id="studentResultSelectorTable" class="data-table">
-                    <thead><tr><th>ছাত্রের নাম</th><th>ফরম নং</th><th>শ্রেণী</th><th>কার্যক্রম</th></tr></thead>
+                    <thead><tr><th>ছাত্রের নাম</th><th>রোল নং</th><th>শ্রেণী</th><th>কার্যক্রম</th></tr></thead>
                     <tbody></tbody>
                 </table>
             </div>
@@ -1034,7 +1035,7 @@
 
         function createResultSelectorRow(student) {
             const row = document.createElement('tr');
-            row.innerHTML = `<td>${student.studentName}</td><td>${toBengaliNumber(student.studentFormNumber || '')}</td><td>${student.studentClass}</td><td style="text-align:center;"><button class="btn-view-result" onclick="viewStudentResult('${student.id}')">ফলাফল দেখুন</button></td>`;
+            row.innerHTML = `<td>${student.studentName}</td><td>${toBengaliNumber(student.roll || '—')}</td><td>${student.studentClass}</td><td style="text-align:center;"><button class="btn-view-result" onclick="viewStudentResult('${student.id}')">ফলাফল দেখুন</button></td>`;
             return row;
         }
         
@@ -1052,7 +1053,6 @@
             }
 
             const studentsInClass = allStudents.filter(s => s.studentDivision === divisionFilter && s.studentClass === classFilter);
-            const filteredStudents = studentsInClass.filter(s => !searchTerm || s.studentName.toLowerCase().includes(searchTerm) || String(s.studentFormNumber).includes(searchTerm));
             const resultsInClass = allResults.filter(r => r.examType === examType && studentsInClass.some(s => s.id === r.studentId));
             
             resultsInClass.forEach(result => {
@@ -1062,10 +1062,28 @@
             resultsInClass.sort((a, b) => b.calculatedTotalMarks - a.calculatedTotalMarks);
 
             let rank = 0, lastMark = -1;
+            const studentRankMap = new Map();
+
             resultsInClass.forEach((result, index) => {
-                if (result.calculatedTotalMarks !== lastMark) { rank = index + 1; lastMark = result.calculatedTotalMarks; }
-                result.position = rank;
+                if (result.calculatedTotalMarks !== lastMark) { 
+                    rank = index + 1; 
+                    lastMark = result.calculatedTotalMarks; 
+                }
+                studentRankMap.set(result.studentId, rank);
             });
+
+            studentsInClass.forEach(s => {
+                s.roll = studentRankMap.get(s.id) || null;
+            });
+
+            const filteredStudents = studentsInClass.filter(s => {
+                const rollStr = String(s.roll || '');
+                return !searchTerm || 
+                       s.studentName.toLowerCase().includes(searchTerm) || 
+                       rollStr.includes(normalizeNumber(searchTerm));
+            });
+
+            filteredStudents.sort((a, b) => (a.roll || 9999) - (b.roll || 9999));
 
             if (filteredStudents.length === 0) {
                 tableBody.innerHTML = '<tr><td colspan="4" style="text-align:center;">কোনো ছাত্র পাওয়া যায়নি।</td></tr>';
@@ -1144,7 +1162,9 @@
 
                 let summaryHTML = `<div class="summary-item"><span class="label">GPA</span><span class="value gpa-value">${gpaText}</span></div><div class="summary-item"><span class="label">মোট নম্বর</span><span class="value">${toBengaliNumber(totalMarks)}</span></div>`;
                 if (averageMarks !== null) { summaryHTML += `<div class="summary-item"><span class="label">গড়</span><span class="value">${toBengaliNumber(averageMarks.toFixed(2))}</span></div>`; }
-                summaryHTML += `<div class="summary-item"><span class="label">অবস্থান</span><span class="value">${toBengaliNumber(result.position || 'N/A')}</span></div>`;
+                
+                const rollNo = student.roll || 'N/A';
+                summaryHTML += `<div class="summary-item"><span class="label">রোল নম্বর</span><span class="value">${toBengaliNumber(rollNo)}</span></div>`;
 
                 resultDisplay.innerHTML = `<div class="result-card"><div class="result-header"><h3>${student.studentName}</h3><p>(${examType}) পরীক্ষার ফলাফল</p></div><div class="result-summary">${summaryHTML}</div><div class="subject-grid">${subjectsHTML}</div></div>`;
             }
@@ -1152,7 +1172,7 @@
             resultDisplay.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
 
-        // MODIFIED FUNCTION: All user requests implemented here
+        // MODIFIED: displayAllResults to handle red color for marks < 33
         function displayAllResults() {
             const divisionFilter = document.getElementById('allResultDivisionFilter').value;
             const classFilter = document.getElementById('allResultClassFilter').value;
@@ -1208,11 +1228,16 @@
                 let rowHTML = `<td class="td-form-no" style="text-align:center;">${toBengaliNumber(res.studentFormNumber)}</td><td class="td-student-name">${res.studentName}</td>`;
                 subjectsInThisResult.forEach(key => {
                     const mark = res[key];
-                    // If mark is null, undefined, or an empty string, display '❌', otherwise display the number.
-                    const displayValue = (mark != null && String(mark).trim() !== '') 
-                        ? toBengaliNumber(mark) 
-                        : '<span style="color: var(--due-color);">❌</span>';
-                    rowHTML += `<td class="td-subject" style="text-align:center;">${displayValue}</td>`;
+                    let cellContent = '';
+                    if (mark != null && String(mark).trim() !== '') {
+                        const numMark = parseInt(mark) || 0;
+                        // FAIL COLOR CHECK: Red if mark is below 33
+                        const failStyle = numMark < 33 ? 'color: var(--due-color); font-weight: bold;' : '';
+                        cellContent = `<span style="${failStyle}">${toBengaliNumber(mark)}</span>`;
+                    } else {
+                        cellContent = '<span style="color: var(--due-color);">❌</span>';
+                    }
+                    rowHTML += `<td class="td-subject" style="text-align:center;">${cellContent}</td>`;
                 });
                 rowHTML += `<td class="td-focus" style="text-align:center; font-weight:600;">${toBengaliNumber(res.totalMarks)}</td>`;
                 if(showAverage) { rowHTML += `<td class="td-focus" style="text-align:center; font-weight:600;">${res.averageMarks ? toBengaliNumber(res.averageMarks.toFixed(2)) : '—'}</td>`; }
@@ -1222,6 +1247,7 @@
             });
         }
         
+        // MODIFIED: printResults to ensure red color stays in print
         function printResults() {
             const classFilterEl = document.getElementById('allResultClassFilter');
             const examFilterEl = document.getElementById('allResultExamFilter');
@@ -1267,10 +1293,17 @@
                         .th-form-no, .td-form-no { width: 8% !important; }
                         th.th-focus { background-color: #004D40 !important; color: white !important; }
                         td.td-focus { font-weight: 700 !important; background-color: #e0f2f1 !important; color: #000 !important; }
+                        
+                        /* FAIL COLOR FOR PRINT */
+                        span[style*="color: var(--due-color)"], span[style*="color: rgb(211, 47, 47)"] {
+                            color: #D32F2F !important;
+                            font-weight: bold !important;
+                        }
+
                         @page { size: A4 landscape; margin: 0.8cm; }
                     </style>
                 </head><body><div class="print-container">
-                        <div class="print-header"><h1>বনচাকী  মিয়াবাড়ি দারুল উলুম কওমি মাদ্রাসা ও এতিমখানা</h1><h2>${printTitle}</h2><p>প্রকাশের তারিখ: ${today}</p></div>
+                        <div class="print-header"><h1>মোবারকপুর দারুল উলুম কওমি মাদ্রাসা ও এতিমখানা</h1><h2>${printTitle}</h2><p>প্রকাশের তারিখ: ${today}</p></div>
                         ${tableHTML}
                 </div></body></html>`;
             
