@@ -1303,7 +1303,7 @@
                         @page { size: A4 landscape; margin: 0.8cm; }
                     </style>
                 </head><body><div class="print-container">
-                        <div class="print-header"><h1>মোবারকপুর দারুল উলুম কওমি মাদ্রাসা ও এতিমখানা</h1><h2>${printTitle}</h2><p>প্রকাশের তারিখ: ${today}</p></div>
+                        <div class="print-header"><h1>বনচাকী  মিয়াবাড়ি দারুল উলুম কওমি মাদ্রাসা ও এতিমখানা</h1><h2>${printTitle}</h2><p>প্রকাশের তারিখ: ${today}</p></div>
                         ${tableHTML}
                 </div></body></html>`;
             
@@ -1447,7 +1447,7 @@
                 Object.keys(data).forEach(id => targetArray.push({ id, ...data[id] }));
                 if (dbRefName === 'students') {
                     targetArray.forEach(student => {
-                        if (student.studentClass === 'প্রথম শ্রেণী') { student.studentClass = 'প্রথম শ্রেণী ( ক )'; }
+                        if (student.studentClass === 'বনচাকী  মিয়াবাড়ি দারুল উলুম কওমি মাদ্রাসা ও এতিমখানা') { student.studentClass = 'প্রথম শ্রেণী'; }
                     });
                     targetArray.sort((a, b) => (Number(a.studentFormNumber) || Infinity) - (Number(b.studentFormNumber) || Infinity));
                 }
